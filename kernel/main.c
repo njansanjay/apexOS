@@ -14,7 +14,7 @@ main()
     consoleinit();
     printkinit();
     printk("\n");
-    printk("Welcome to ApexOS v0.1\n");
+    printk("Welcome to ApexOS v0.2\n");
     printk("\n");
     kinit();            // physical page allocator
     kvminit();          // create kernel page table

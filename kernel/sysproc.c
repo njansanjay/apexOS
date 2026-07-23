@@ -107,3 +107,15 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64
+sys_procinfo(void)
+{
+  uint64 addr;
+  int max_procs;
+
+  argaddr(0, &addr);
+  argint(1, &max_procs);
+  return getprocinfo(addr, max_procs);
+}
+

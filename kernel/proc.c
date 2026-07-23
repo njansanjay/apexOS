@@ -690,3 +690,38 @@ procdump(void)
     printk("\n");
   }
 }
+
+// Collect active process telemetry into user-space buffer
+int
+getprocinfo(uint64 addr, int max_procs)
+{
+  struct proc *p;
+  struct proc_info info;
+  struct proc *cur = myproc();
+  int count = 0;
+
+  if (max_procs <= 0)
+    return -1;
+
+  for (p = proc; p < &proc[NPROC] && count < max_procs; p++) {
+    acquire(&p->lock);
+    if (p->state != UNUSED) {
+      info.pid = p->pid;
+      info.ppid = p->parent ? p->parent->pid : 0;
+      info.state = (int)p->state;
+      info.sz = p->sz;
+      safestrcpy(info.name, p->name, sizeof(info.name));
+      release(&p->lock);
+
+      if (copyout(cur->pagetable, addr + (uint64)count * sizeof(struct proc_info), (char *)&info, sizeof(struct proc_info)) < 0) {
+        return -1;
+      }
+      count++;
+    } else {
+      release(&p->lock);
+    }
+  }
+
+  return count;
+}
+
